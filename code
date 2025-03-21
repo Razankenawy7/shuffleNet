@@ -1,0 +1,21 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torchvision.models as models
+
+# Load pre-trained ShuffleNetV2
+shufflenet = models.shufflenet_v2_x1_0(weights=models.ShuffleNet_V2_X1_0_Weights.DEFAULT)  # Updated way
+
+# Modify the last fully connected (fc) layer for binary classification
+num_ftrs = shufflenet.fc.in_features
+shufflenet.fc = nn.Linear(num_ftrs, 2)  # Open (1) / Closed (0)
+
+# Move model to GPU if available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+shufflenet = shufflenet.to(device)
+
+# Define loss function and optimizer
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(shufflenet.parameters(), lr=0.001)
+
+print("Model modified successfully!")
